@@ -1,0 +1,149 @@
+
+using System;
+using System.Collections.Generic;
+
+
+namespace WypozyczalniaSamochodow
+        {
+            class Program
+            {
+                static void Main(string[] args)
+                {
+                    
+                    Klient klient1 = new Klient(1, "Jan Kowalski", new DateTime(2015, 1, 1));
+                    Klient klient2 = new Klient(2, "Anna Nowak", new DateTime(2018, 5, 1));
+                    Klient klient3 = new Klient(3, "Kasia Jarosz", new DateTime(2016, 4, 2));
+                    Klient klient4 = new Klient(4, "Zosia Mozgal", new DateTime(2013, 7, 2));
+                    List<Klient> klienci = new List<Klient> { klient1, klient2, klient3, klient4 };
+
+                    Samochod samochod1 = new Samochod(1, "Toyota Corolla", "kompakt", "benzyna", 150, true);
+                    Samochod samochod2 = new Samochod(2, "Ford Focus", "kompakt", "diesel", 180, false);
+                    Samochod samochod3 = new Samochod(3, "Mercedes-Benz C-Class", "premium", "benzyna", 350, true);
+                    Samochod samochod4 = new Samochod(4, "Fiat 126p", "mini", "benzyna", 50, true);
+                    Samochod samochod5 = new Samochod(5, "Toyota Aygo", "mini", "diesel", 70, true);
+                    Samochod samochod6 = new Samochod(6, "Tesla model s", "premium", "elektryczne", 500, true);
+                    List<Samochod> samochody = new List<Samochod> { samochod1, samochod2, samochod3, samochod4, samochod5, samochod6 };
+
+                    Console.WriteLine("Wypożyczalnia samochodów");
+                    while (true)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("1. Wyświetl listę klientów");
+                        Console.WriteLine("2. Wyświetl listę samochodów");
+                        Console.WriteLine("3. Wypożycz samochód");
+                        Console.WriteLine("4. Wyjdź z programu");
+                        Console.Write("Wybierz opcję: ");
+                        int wybor = int.Parse(Console.ReadLine());
+                        switch (wybor)
+                        {
+                            case 1:
+                                Console.WriteLine("Lista klientów:");
+                                foreach (Klient klient in klienci)
+                                {
+                                    Console.WriteLine($"Id: {klient.Id}, Imię i nazwisko: {klient.ImieINazwisko}, Data uzyskania prawa jazdy: {klient.DataUzyskaniaPrawaJazdy.ToShortDateString()}");
+                                }
+                                break;
+                            case 2:
+                                Console.WriteLine("Lista samochodów:");
+                                foreach (Samochod samochod in samochody)
+                                {
+                                    Console.WriteLine($"Id: {samochod.Id}, Marka i model: {samochod.MarkaModel}, Segment: {samochod.Segment}, Rodzaj paliwa: {samochod.RodzajPaliwa}, Cena wypożyczenia za dobę: {samochod.CenaWypozyczeniaZaDobe}, Status: {(samochod.Dostepny ? "dostępny" : "niedostępny")}");
+                                }
+                                break;
+                            case 3:
+                                Console.Write("Podaj id klienta: ");
+                                int idKlienta = int.Parse(Console.ReadLine());
+                                Klient klientWybrany = null;
+                                foreach (Klient klient in klienci)
+                                {
+                                    if (klient.Id == idKlienta)
+                                    {
+                                        klientWybrany = klient;
+                                        break;
+                                    }
+                                }
+                                if (klientWybrany == null)
+                                {
+                                    Console.WriteLine("Nie ma klienta o podanym id.");
+                                    break;
+                                }
+
+                                Console.Write("Podaj segment samochodu: ");
+                                string segment = Console.ReadLine();
+                                Console.Write("Podaj rodzaj paliwa: ");
+                                string rodzajPaliwa = Console.ReadLine();
+                                Console.Write("Podaj ilość dni wypożyczenia: ");
+                                int iloscDni = int.Parse(Console.ReadLine());
+                                Samochod samochodWybrany = null;
+                                foreach (Samochod samochod in samochody)
+                                {
+                                    if (samochod.Segment == segment && samochod.RodzajPaliwa == rodzajPaliwa && samochod.Dostepny)
+                                    {
+                                        samochodWybrany = samochod;
+                                        break;
+                                    }
+                                }
+                                if (samochodWybrany == null)
+                                {
+                                    Console.WriteLine("Nie ma odpowiedniego samochodu w ofercie.");
+                                    break;
+                                }
+
+                                DateTime dataWypozyczenia = DateTime.Now;
+                                DateTime dataZwrotu = dataWypozyczenia.AddDays(iloscDni);
+                                double cena = iloscDni * samochodWybrany.CenaWypozyczeniaZaDobe;
+                                samochodWybrany.Dostepny = false;
+
+                                Console.WriteLine("Wypożyczenie zostało dokonane:");
+                                Console.WriteLine($"Data wypożyczenia: {dataWypozyczenia}");
+                                Console.WriteLine($"Imię i nazwisko klienta: {klientWybrany.ImieINazwisko}");
+                                Console.WriteLine($"Data zwrotu pojazdu: {dataZwrotu}");
+                                Console.WriteLine($"Marka i model samochodu: {samochodWybrany.MarkaModel}");
+                                Console.WriteLine($"Całkowita cena za wypożyczenie: {cena}");
+                                break;
+                            case 4:
+                                Console.WriteLine("Do widzenia!");
+                                return;
+                            default:
+                                Console.WriteLine("Niepoprawna opcja.");
+                                break;
+                        }
+                    }
+                }
+            }
+
+            class Klient
+            {
+                public int Id { get; set; }
+                public string ImieINazwisko { get; set; }
+                public DateTime DataUzyskaniaPrawaJazdy { get; set; }
+
+                public Klient(int id, string imieINazwisko, DateTime dataUzyskaniaPrawaJazdy)
+                {
+                    Id = id;
+                    ImieINazwisko = imieINazwisko;
+                    DataUzyskaniaPrawaJazdy = dataUzyskaniaPrawaJazdy;
+                }
+            }
+
+            class Samochod
+            {
+                public int Id { get; set; }
+                public string MarkaModel { get; set; }
+                public string Segment { get; set; }
+                public string RodzajPaliwa { get; set; }
+                public double CenaWypozyczeniaZaDobe { get; set; }
+                public bool Dostepny { get; set; }
+
+                public Samochod(int id, string markaModel, string segment, string rodzajPaliwa, double cenaWypozyczeniaZaDobe, bool dostepny)
+                {
+                    Id = id;
+                    MarkaModel = markaModel;
+                    Segment = segment;
+                    RodzajPaliwa = rodzajPaliwa;
+                    CenaWypozyczeniaZaDobe = cenaWypozyczeniaZaDobe;
+                    Dostepny = dostepny;
+                }
+            }
+        }
+        
